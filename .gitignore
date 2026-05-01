@@ -1,0 +1,24 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Secrets (never commit)
+.env
+
+# Virtual environments
+.venv
+
+# Node frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Local tooling / agent state (not part of the app)
+.autoclaude/
+.claude_agent_farm_state.json
+.claude_agent_farm_backups/
+.heartbeats/

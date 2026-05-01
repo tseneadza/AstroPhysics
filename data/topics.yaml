@@ -1,0 +1,63 @@
+# Topics shown in the sidebar. Restart the app after editing.
+#
+# Schema:
+#   id            (required) stable slug
+#   title         (required) button label
+#   blurb         (required) tooltip text
+#   anchors       (optional) list of keyword strings for prompts
+#   arxiv_query   (optional) e.g. cat:astro-ph.CO — UI pre-fills arXiv search + enables context
+#
+topics:
+  - id: cosmo
+    title: Cosmology
+    blurb: Expansion, microwave background, dark matter and energy — how we model the universe at large scales.
+    anchors:
+      - Friedmann–Lemaître–Robertson–Walker metric
+      - ΛCDM
+      - cosmic microwave background
+
+  - id: stars
+    title: Stellar physics
+    blurb: Nuclear fusion, hydrostatic equilibrium, spectra, stellar evolution endpoints.
+    anchors:
+      - Eddington limit
+      - H–R diagram
+      - white dwarfs / neutron stars
+
+  - id: gw
+    title: Gravitational waves
+    blurb: Ripples in spacetime from compact binaries and other energetic events; interferometric detection.
+    anchors:
+      - LIGO/Virgo/KAGRA chirp
+      - inspiral–merger–ringdown
+      - strain amplitude
+
+  - id: astro-ph-CO
+    title: "CO — Cosmology and Nongalactic Astrophysics"
+    blurb: arXiv astro-ph.CO — cosmology and nongalactic astrophysics.
+    arxiv_query: cat:astro-ph.CO
+
+  - id: astro-ph-EP
+    title: "EP — Earth and Planetary Astrophysics"
+    blurb: arXiv astro-ph.EP — Earth and planetary astrophysics.
+    arxiv_query: cat:astro-ph.EP
+
+  - id: astro-ph-GA
+    title: "GA — Astrophysics of Galaxies"
+    blurb: arXiv astro-ph.GA — galaxy formation, evolution, and structure.
+    arxiv_query: cat:astro-ph.GA
+
+  - id: astro-ph-HE
+    title: "HE — High Energy Astrophysical Phenomena"
+    blurb: arXiv astro-ph.HE — high-energy astrophysical phenomena.
+    arxiv_query: cat:astro-ph.HE
+
+  - id: astro-ph-IM
+    title: "IM — Instrumentation and Methods for Astrophysics"
+    blurb: arXiv astro-ph.IM — instrumentation, methods, data analysis for astrophysics.
+    arxiv_query: cat:astro-ph.IM
+
+  - id: astro-ph-SR
+    title: "SR — Solar and Stellar Astrophysics"
+    blurb: arXiv astro-ph.SR — solar and stellar astrophysics.
+    arxiv_query: cat:astro-ph.SR
