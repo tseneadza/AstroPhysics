@@ -1,100 +1,144 @@
 # Astrophysics AI Lab
 
-**Astrophysics AI Lab** is a web app for AI-assisted astrophysics learning: conversational explanations, optional retrieval from arXiv (astro-ph), simple interactive visuals, and sidebar topics you can edit without changing code.
+Astrophysics AI Lab is a web app for learning astrophysics with AI assistance. It combines conversational Q&A, optional arXiv context, and lightweight visuals so you can explore concepts and recent topics from one interface.
 
-It is designed to run under **Codehome Hub** (group **The Sciences**) or standalone on your machine.
+The app runs under Codehome Hub (The Sciences group) or directly on your machine.
 
-## Features
+## What Was Built
 
-- **Hybrid chat** — Streamed replies over **Server-Sent Events** from **Ollama**, an **OpenAI-compatible** API, or **Anthropic Messages**, with UI-selectable provider and optional **model id** override. Invalid API keys return clear HTTP 401/403-style hints. See `astrophysics/llm_router.py`, `astrophysics/api_errors.py`, and `POST /api/chat/stream` in `astrophysics/main.py`.
-- **Topics sidebar** — Buttons and tooltips are loaded from `data/topics.yaml`. Includes general themes (e.g. cosmology, stellar physics) and **arXiv astro-ph** subcategories (CO, EP, GA, HE, IM, SR) with optional `arxiv_query` so the UI can pre-fill arXiv search and enable “Add arXiv context” for that category.
-- **arXiv** — Optional context injected into chat when enabled; separate panel to fetch recent/search-matched **astro-ph** papers with caching. See `astrophysics/retrieval_arxiv.py` and `GET /api/arxiv/papers`.
-- **Visuals** — Normalized **blackbody spectrum** (Plotly JSON) and a schematic **orbital** scene (JSON consumed by Three.js in the frontend). See `astrophysics/viz.py` and the right-hand panel in the UI.
-- **Optional image generation** — When `ASTRO_ENABLE_IMAGE_GEN` is true and an API key is set, `POST /api/image/generate` can request illustrative images (OpenAI-compatible images endpoint). Off by default.
+- A FastAPI backend with streaming chat responses (SSE).
+- Hybrid provider routing for:
+  - Local Ollama
+  - OpenAI-compatible APIs
+  - Anthropic Messages API
+- Provider/model selection in the UI with optional model override.
+- Better provider error messages (invalid/missing key, permission, rate limit, bad request).
+- Topic configuration via `data/topics.yaml` (no code edits needed for new topics).
+- Optional arXiv context injection + paper retrieval panel.
+- Visual tools:
+  - Blackbody spectrum (Plotly)
+  - Orbit sketch (Three.js)
 
-## Tech stack
+## Tech Stack
 
+| Layer | Technologies |
+| --- | --- |
+| Backend | Python 3.12+, FastAPI, Uvicorn, httpx, pydantic-settings, PyYAML, arxiv, plotly |
+| Frontend | Vite, TypeScript, markdown-it, Mermaid, Plotly.js, Three.js |
+| Config | `.env` (runtime secrets/settings), `data/topics.yaml` (topic catalog) |
 
-| Layer    | Technologies                                                                    |
-| -------- | ------------------------------------------------------------------------------- |
-| Backend  | Python 3.12+, FastAPI, Uvicorn, httpx, pydantic-settings, PyYAML, arxiv, plotly |
-| Frontend | Vite, TypeScript, markdown-it, Mermaid, Plotly.js, Three.js                     |
-| Config   | `.env` (see `.env.example`), `data/topics.yaml`                                 |
+## Running With Codehome Hub
 
+- Hub app manifest: `app.json`
+- App id: `astro-physics-hub`
+- Default port: `5112`
+- Start script: `./start.sh`
 
-## Codehome Hub
+Hub sets `PORT` automatically when launching from the card.
 
-- This app is declared in `**app.json`** at the project root (`id`: `astro-physics-hub`, default web port **5112**).
-- **Start command:** `./start.sh` (Hub sets `**PORT`** in the environment when it launches the app).
-- Hub discovery includes `**~/Codehome/The Sciences/AstroPhysics**` (alongside other science apps). The API assigns apps under that path to the **The Sciences** group.
-- After Hub is running, you can confirm discovery with:
-  ```bash
-  curl -s http://localhost:8085/api/cards | jq '.apps[] | select(.id == "astro-physics-hub")'
-  ```
+Quick verify from Hub API:
 
-## Quick start
+```bash
+curl -s http://localhost:8085/api/cards | jq '.apps[] | select(.id == "astro-physics-hub")'
+```
 
-**Prerequisites:** Python 3.12+ and, if `frontend/dist` is missing, **Node.js** so `start.sh` can run `npm install` / `npm run build` in `frontend/`.
+## Local Quick Start
 
-1. Copy `**.env.example`** to `**.env**` and set API keys / URLs (see [Configuration](#configuration)). Never commit `.env`.
-2. From this directory, run `**./start.sh**`. It creates a `.venv` if needed, installs `requirements.txt`, builds the frontend when necessary, and starts Uvicorn on `**PORT**` (default `5112` if not set).
-3. Open **[http://localhost:PORT/](http://localhost:PORT/)** in your browser (use the port Hub shows, or `5112` when running locally).
+Prerequisites:
 
-**Local development (optional):**
+- Python 3.12+
+- Node.js (only needed when `frontend/dist` is missing and frontend build is required)
 
-- `python -m uvicorn astrophysics.main:app --host 0.0.0.0 --port 5112 --reload` after activating the venv and installing dependencies.
-- Or run `python main.py` for a dev-oriented entry (reload on port 5112).
+Steps:
+
+1. Copy `.env.example` to `.env` and set your keys/config.
+2. Run:
+
+   ```bash
+   ./start.sh
+   ```
+
+   This script will:
+   - create `.venv` if needed
+   - install Python dependencies
+   - build frontend assets if needed
+   - start Uvicorn
+
+3. Open `http://localhost:5112` (or the `PORT` provided by Hub).
+
+Optional dev run:
+
+```bash
+python -m uvicorn astrophysics.main:app --host 0.0.0.0 --port 5112 --reload
+```
 
 ## Configuration
 
-Settings are read from `**.env`** in the project root (see `astrophysics/config.py`).
+Configuration is loaded from `.env` (see `astrophysics/config.py`).
 
+| Variable | Purpose |
+| --- | --- |
+| `ASTRO_PRIMARY` / `PRIMARY` | Auto routing default (`local` or `hosted`) |
+| `OLLAMA_BASE_URL` | Ollama server URL |
+| `OLLAMA_MODEL` | Default Ollama model |
+| `OPENAI_API_KEY` | API key for OpenAI-compatible providers |
+| `OPENAI_BASE_URL` | Base URL for OpenAI-compatible chat completions |
+| `OPENAI_MODEL` | Default model for OpenAI-compatible provider |
+| `ANTHROPIC_API_KEY` | Anthropic API key |
+| `ANTHROPIC_BASE_URL` | Anthropic base URL (`https://api.anthropic.com`) |
+| `ANTHROPIC_MODEL` | Default Anthropic model |
+| `ASTRO_ENABLE_IMAGE_GEN` | Enables image endpoint when set true and key is present |
 
-| Variable                     | Purpose                                                                                        |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- |
-| `ASTRO_PRIMARY` or `PRIMARY` | Default bias: `local` (Ollama first) or `hosted` (API first). The UI can override per request. |
-| `OLLAMA_BASE_URL`            | Ollama base URL (default `http://127.0.0.1:11434`).                                            |
-| `OLLAMA_MODEL`               | Ollama model name.                                                                             |
-| `OPENAI_API_KEY`             | Key for any OpenAI-compatible provider.                                                        |
-| `OPENAI_BASE_URL`            | Chat completions base (e.g. `https://api.openai.com/v1`).                                      |
-| `OPENAI_MODEL`               | Model id for hosted chat.                                                                      |
-| `ANTHROPIC_API_KEY`          | [Anthropic](https://console.anthropic.com/) API key for Claude models.                         |
-| `ANTHROPIC_BASE_URL`         | Default `https://api.anthropic.com` (change only if using a proxy).                            |
-| `ANTHROPIC_MODEL`            | Default Claude model id (e.g. `claude-3-5-sonnet-20241022`).                                   |
-| `ASTRO_ENABLE_IMAGE_GEN`     | Set `true` to allow image generation when a key is present.                                    |
+Security note: `.env` is gitignored. Do not commit real credentials.
 
+## Topics (No Code Changes)
 
-**Security:** `.env` is listed in `.gitignore`. Do not commit secrets. Replace any placeholder values in your own `.env`; rotate keys if they were ever exposed.
+Topic buttons are loaded from `data/topics.yaml`.
 
-## Customizing topics (no code changes)
+To add/edit topics:
 
-Edit `**data/topics.yaml`** and restart the app (or restart from Hub) so changes load.
+1. Update `data/topics.yaml`
+2. Restart the app
 
+Schema:
 
-| Field         | Required | Purpose                                                                                                                  |
-| ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `id`          | yes      | Stable slug                                                                                                              |
-| `title`       | yes      | Button label                                                                                                             |
-| `blurb`       | yes      | Tooltip                                                                                                                  |
-| `anchors`     | no       | Optional keyword list (appended to the generated prompt)                                                                 |
-| `arxiv_query` | no       | e.g. `cat:astro-ph.CO` — pre-fills the arXiv search field and enables “Add arXiv context” when the user clicks the topic |
+| Field | Required | Purpose |
+| --- | --- | --- |
+| `id` | yes | Stable slug |
+| `title` | yes | Button label |
+| `blurb` | yes | Tooltip text |
+| `anchors` | no | Prompt hints |
+| `arxiv_query` | no | Prefills arXiv search and enables context |
 
+## API Surface (Key Routes)
 
-## Project layout
+- `GET /api/meta` — provider defaults and availability info for UI
+- `POST /api/chat/stream` — streamed chat
+- `GET /api/topics` — topics loaded from YAML
+- `GET /api/arxiv/papers` — paper search/list
+- `GET /api/viz/blackbody` — Plotly figure JSON
+- `GET /api/viz/orbit-spec` — scene spec for orbit sketch
+- `POST /api/image/generate` — optional image generation endpoint
 
-```
+## Project Layout
+
+```text
 AstroPhysics/
-├── app.json              # Hub manifest
-├── start.sh              # venv, deps, optional frontend build, uvicorn
+├── app.json
+├── start.sh
 ├── requirements.txt
-├── main.py               # Optional dev entry
+├── main.py
 ├── .env.example
 ├── data/
-│   └── topics.yaml       # Sidebar topics (YAML)
-├── astrophysics/         # FastAPI app, LLM routing, arXiv, viz, topics loader
-└── frontend/             # Vite + TypeScript UI (build output in frontend/dist)
+│   └── topics.yaml
+├── astrophysics/
+│   ├── main.py
+│   ├── llm_router.py
+│   ├── api_errors.py
+│   ├── retrieval_arxiv.py
+│   ├── topics_loader.py
+│   └── viz.py
+└── frontend/
+    ├── src/main.ts
+    └── ...
 ```
-
-## Project Manager (Codehome)
-
-If **ProjManager** is configured to scan this project’s path in its `APP_PATHS`, the app can appear there for task sync (requires at least one markdown file in the project root—this README counts).
