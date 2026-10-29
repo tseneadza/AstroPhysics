@@ -4,17 +4,37 @@
   "description": "AI-assisted astrophysics learning: chat, diagrams, interactive concepts, and recent arXiv highlights",
   "version": "0.1.0",
   "type": "web",
-  "icon": "🌌",
+  "icon": "\ud83c\udf0c",
   "category": "science",
   "web": {
     "enabled": true,
     "entry": "start.sh",
     "port": 5112,
     "framework": "fastapi",
-    "command": ["./start.sh"]
+    "command": [
+      "./start.sh"
+    ]
   },
   "desktop": {
     "enabled": false
   },
-  "tags": ["astrophysics", "science", "ai", "education", "visualization"]
+  "tags": [
+    "astrophysics",
+    "science",
+    "ai",
+    "education",
+    "visualization"
+  ],
+  "scripts": [
+    {
+      "name": "main",
+      "path": "main.py",
+      "description": "Script: main.py"
+    },
+    {
+      "name": "start",
+      "path": "start.sh",
+      "description": "Script: start.sh"
+    }
+  ]
 }
